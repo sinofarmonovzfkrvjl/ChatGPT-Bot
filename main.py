@@ -23,17 +23,14 @@ async def Callback(call: types.CallbackQuery):
 
 @dp.message()
 async def echo(message: types.Message):
-    genai.configure(api_key="AIzaSyBeJtlvS9r5apzbdQGqsuM2JZJZjVdcTqI")
+    genai.configure(api_key="")
     model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content(message.text)
     await message.answer(response.text, parse_mode="MARKDOWN")
-
-@dp.callback_query(lambda call: call.data == "get_audio")
-async def Callback(call: types.CallbackQuery):
     
 
 async def main():
-    bot = Bot(token="5904607271:AAEDJWUULTrD3zV8HOY7JbU94aiXk5Qexno")
+    bot = Bot(token="")
     await dp.start_polling(bot)
 
 if __name__ == '__main__':
