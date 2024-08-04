@@ -1,29 +1,17 @@
-from aiogram import Bot, Dispatcher, types, executor
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import CommandStart
 import logging
 import google.generativeai as genai
-from keyboards import bot_language
-import os
-from dotenv import load_dotenv
+import asyncio
+from keyboards import bot_language, get_audio
 
-load_dotenv()
+dp = Dispatcher()
 
-bot = Bot(token=os.getenv("BOT_TOKEN"))
-dp = Dispatcher(bot)
-
-@dp.message_handler(commands='start')
+@dp.message(CommandStart())
 async def start(message: types.Message):
     await message.answer(f'Choose the language | kerakli tilni tanlang | выберите желаемый язык', reply_markup=bot_language)
 
-@dp.message_handler()
-async def main(message: types.Message):
-    global text
-    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content(message.text)
-    text = response.text
-    await message.answer(text=text, parse_mode="MARKDOWN")
-
-@dp.callback_query_handler()
+@dp.callback_query()
 async def Callback(call: types.CallbackQuery):
     await call.message.delete()
     if call.data == "uz":
@@ -33,6 +21,21 @@ async def Callback(call: types.CallbackQuery):
     elif call.data == "ru":
         await call.message.answer(f"Привет <b>{call.message.chat.full_name}</b>\nя бот Английский помощник\nя могу помочь вам узнать английский**", parse_mode="HTML")
 
+@dp.message()
+async def echo(message: types.Message):
+    genai.configure(api_key="AIzaSyBeJtlvS9r5apzbdQGqsuM2JZJZjVdcTqI")
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    response = model.generate_content(message.text)
+    await message.answer(response.text, parse_mode="MARKDOWN")
+
+@dp.callback_query(lambda call: call.data == "get_audio")
+async def Callback(call: types.CallbackQuery):
+    
+
+async def main():
+    bot = Bot(token="5904607271:AAEDJWUULTrD3zV8HOY7JbU94aiXk5Qexno")
+    await dp.start_polling(bot)
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    executor.start_polling(dp, skip_updates=False)
+    asyncio.run(main())
