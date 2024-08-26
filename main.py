@@ -4,6 +4,7 @@ import logging
 import asyncio
 import requests
 from keyboards import bot_language
+import os
 
 dp = Dispatcher()
 
@@ -15,21 +16,21 @@ async def start(message: types.Message):
 async def Callback(call: types.CallbackQuery):
     await call.message.delete()
     if call.data == "uz":
-        await call.message.answer(f"Salom <b>{call.message.chat.full_name}</b>\nmen AI Assistant botman\nme sizge ingliz tilini o'rganishingizga yordam beraman", parse_mode="HTML")
+        await call.message.answer(f"Salom <b>{call.message.chat.full_name}</b>\nmen AI Assistant botman", parse_mode="HTML")
     elif call.data == "en":
-        await call.message.answer(f"Hello <b>{call.message.chat.full_name}</b>\ni'm AI Assistant Bot\n i can help you to learn english**", parse_mode="HTML")
+        await call.message.answer(f"Hello <b>{call.message.chat.full_name}</b>\ni'm AI Assistant Bot", parse_mode="HTML")
     elif call.data == "ru":
-        await call.message.answer(f"Привет <b>{call.message.chat.full_name}</b>\nя бот помощник\nя могу помочь вам узнать английский**", parse_mode="HTML")
+        await call.message.answer(f"Привет <b>{call.message.chat.full_name}</b>\nя бот помощник", parse_mode="HTML")
 
 @dp.message()
 async def echo(message: types.Message):
     res = requests.get("https://gemini-api-qnmb.onrender.com/api/v1/generate?word=" + message.text)
-    await message.answer(res.json())
-    
+    await message.answer(res.json(), parse_mode="markdown")
 
 async def main():
-    bot = Bot(token="5904607271:AAFycN_K-pXKmue3YR8zyGYS2Q5A9MZnJzk")
+    bot = Bot(token=os.getenv("BOT_TOKEN"))
     await dp.start_polling(bot)
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
